@@ -19,7 +19,7 @@ extern process_t * current_process;
 extern process_t * process_queue;
 
 typedef struct node {
-	process_t val;
+	process_t *val;
 	struct node *prev;
 	struct node *next;
 } node;

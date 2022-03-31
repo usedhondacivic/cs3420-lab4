@@ -14,6 +14,7 @@ struct double_linked_list scheduler = {
 	.list_end = NULL
 };
 
+
 // adds element to the beginning of the list
 void add_elem_begin(double_linked_list * list, node * elem) {
 	assert(list->list_start->prev == NULL);
@@ -67,17 +68,19 @@ node * remove_first_elem(double_linked_list * list) {
 int process_create (void(*f) (void), int n){
 	// Make an element for the queue containing info about the process
 	node *new_elem_ptr = malloc(sizeof(node));
-	if(new_elem_ptr == NULL){
+	new_elem_ptr->val = malloc(sizeof(process_t));
+
+	if(new_elem_ptr == NULL || new_elem_ptr->val == NULL){
 		return -1;
 	}
-	new_elem_ptr->val.sp = process_stack_init(f, n);
-	new_elem_ptr->val.orig_sp = new_elem_ptr->val.sp;
-	new_elem_ptr->val.n = n;
-	new_elem_ptr->val.blocked = false;
+	new_elem_ptr->val->sp = process_stack_init(f, n);
+	new_elem_ptr->val->orig_sp = new_elem_ptr->val->sp;
+	new_elem_ptr->val->n = n;
+	new_elem_ptr->val->blocked = false;
 	new_elem_ptr->prev = NULL;
 	new_elem_ptr->next = NULL;
 
-	if(new_elem_ptr->val.sp == NULL) return -1; // If the new stack cannot be allocated, return and error
+	if(new_elem_ptr->val->sp == NULL) return -1; // If the new stack cannot be allocated, return and error
 
 	add_elem_end(&scheduler, new_elem_ptr); // Add the new element to the queue
 
@@ -103,7 +106,7 @@ unsigned int * process_select(unsigned int * cursp){
 	node *fst = remove_first_elem(&scheduler); //Check the first element
 	if(cursp == NULL){ // Either the running process finished or it is the first time process_select is being called
 		if(!first_select){ //If its not the first time, free memory from the running process
-			process_stack_free(fst->val.orig_sp, fst->val.n);
+			process_stack_free(fst->val->orig_sp, fst->val->n);
 			free(fst);
 			current_process = NULL;
 		}else{ // If it is the first time, put the element back in the front of the queue
@@ -111,9 +114,10 @@ unsigned int * process_select(unsigned int * cursp){
 			first_select = false;
 		}
 	}else{
+		fst->val->sp = cursp;
+
 		//Put running process back into queue
 		if(!(current_process->blocked)){
-			fst->val.sp = cursp;
 			add_elem_end(&scheduler, fst);
 		}
 	}
@@ -122,6 +126,6 @@ unsigned int * process_select(unsigned int * cursp){
 	if(scheduler.list_start == NULL){
 		return NULL;
 	}
-	current_process = &(scheduler.list_start->val);
+	current_process = scheduler.list_start->val;
 	return current_process->sp;
 }
