@@ -32,54 +32,13 @@ typedef struct double_linked_list {
 extern double_linked_list scheduler;
 
 // adds element to the beginning of the list
-void add_elem_begin(double_linked_list * list, node * elem) {
-	assert(list->list_start->prev == NULL);
-	elem->next = list->list_start;
-	elem->prev = NULL;
-	list->list_start->prev = elem;
-	list->list_start = elem;
-}
+void add_elem_begin(double_linked_list * list, node * elem);
 
 // adds element to the end of the list
-void add_elem_end(double_linked_list * list, node * elem) {
-	if(list->list_start == NULL) {
-		assert(list->list_end == NULL);
-		list->list_start = elem;
-		list->list_end = elem;
-
-		elem->next = NULL;
-		elem->prev = NULL;
-	} else {
-		assert(list->list_end->next == NULL);
-		list->list_end->next = elem;
-		elem->prev = list->list_end;
-
-		list->list_end = elem;
-		elem->next = NULL;
-	}
-}
+void add_elem_end(double_linked_list * list, node * elem);
 
 // removes and returns first element of list, null if list is empty
-node * remove_first_elem(double_linked_list * list) {
-	struct node *elem;
-	if(list->list_start == NULL) {
-		assert(list->list_end == NULL);
-		elem = NULL;
-	} else {
-		assert(list->list_start->prev == NULL);
-		elem = list->list_start;
-		list->list_start = list->list_start->next;
-		elem->next = NULL;
-		assert(elem->prev == NULL);
-		if(list->list_start != NULL) {
-			list->list_start->prev = NULL;
-		} else {
-			list->list_end = NULL;
-		}
-	}
-
-	return elem;
-}
+node * remove_first_elem(double_linked_list * list);
 /**
  * This defines the lock structure
  */

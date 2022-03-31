@@ -6,12 +6,12 @@
 #include "shared_structs.h"
 
 void l_init(lock_t* l){
-	PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
+	//PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
 	//init default values
 	l->queue.list_start = NULL;
 	l->queue.list_end = NULL;
 	l->available = true;
-	PIT->CHANNEL[0].TCTRL = 3; //Enable interupts
+	//PIT->CHANNEL[0].TCTRL = 3; //Enable interupts
 }
 
 void l_lock(lock_t* l){
