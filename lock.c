@@ -6,8 +6,12 @@
 #include "shared_structs.h"
 
 void l_init(lock_t* l){
+	PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
 	//init default values
-
+	l->queue.list_start = NULL;
+	l->queue.list_end = NULL;
+	l->available = true;
+	PIT->CHANNEL[0].TCTRL = 3; //Enable interupts
 }
 
 void l_lock(lock_t* l){
@@ -16,10 +20,14 @@ void l_lock(lock_t* l){
 		//Change current process to show it has been blocked
 		current_process->blocked = true;
 		//add blocked process to list
-		//Make sure this process doesn't get put back into the scheduler (change process_select)
+		node *new_elem_ptr = malloc(sizeof(node));
+		new_elem_ptr->val = *current_process;
+		new_elem_ptr->prev = NULL;
+		new_elem_ptr->next = NULL;
+		add_elem_end(&(l->queue), new_elem_ptr);
 		process_blocked();
 	}else{
-		l->available = true;
+		l->available = false;
 	}
 	PIT->CHANNEL[0].TCTRL = 3; //Enable interupts
 }
@@ -27,6 +35,10 @@ void l_lock(lock_t* l){
 void l_unlock(lock_t* l){
 	PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
 	//Add first blocked process back into the scheduler
+	node *fst = remove_first_elem(&(l->queue));
+	fst->val.blocked = false;
+	add_elem_end(&scheduler, fst);
+
 	l->available = true;
 	PIT->CHANNEL[0].TCTRL =3; //Enable interupts
 }

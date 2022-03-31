@@ -1,7 +1,5 @@
-#include "3140_concur.h"
 #include <stdlib.h>
 #include <MKL46Z4.h>
-#include <assert.h>
 #include <stdbool.h>
 #include "shared_structs.h"
 
@@ -10,12 +8,6 @@ process_t *current_process = NULL;
 bool first_select = true;
 
 unsigned int *new_sp = NULL;
-
-struct process_state {
-	unsigned int * sp; // Current Stack pointer
-	unsigned int * orig_sp; // Original Stack pointer
-	int n; // Size allocated
-};
 
 struct double_linked_list scheduler = {
 	.list_start = NULL,
@@ -31,6 +23,7 @@ int process_create (void(*f) (void), int n){
 	new_elem_ptr->val.sp = process_stack_init(f, n);
 	new_elem_ptr->val.orig_sp = new_elem_ptr->val.sp;
 	new_elem_ptr->val.n = n;
+	new_elem_ptr->val.blocked = false;
 	new_elem_ptr->prev = NULL;
 	new_elem_ptr->next = NULL;
 
@@ -68,8 +61,10 @@ unsigned int * process_select(unsigned int * cursp){
 		}
 	}else{
 		//Put running process back into queue
-		fst->val.sp = cursp;
-		add_elem_end(&scheduler, fst);
+		if(!(current_process->blocked)){
+			fst->val.sp = cursp;
+			add_elem_end(&scheduler, fst);
+		}
 	}
 
 	//Get next process from linked list, return stack pointer
