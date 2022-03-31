@@ -93,8 +93,8 @@ void process_start (void){
 	SIM->SCGC6 = SIM_SCGC6_PIT_MASK; // Enable clock to PIT
 	PIT->MCR = 0x00; // Enable PIT timers
 
-	//PIT->CHANNEL[0].LDVAL = 0x00004E20; // 20k cycles @ 10Mhz = 2 ms before switching processes
-	PIT->CHANNEL[0].LDVAL = 0x001E8480;
+	PIT->CHANNEL[0].LDVAL = 0x00004E20; // 20k cycles @ 10Mhz = 2 ms before switching processes
+	//PIT->CHANNEL[0].LDVAL = 0x001E8480;
 	PIT->CHANNEL[0].TCTRL |= (1 << 1); // Enable interrupts for channel 0
 
 	PIT->CHANNEL[0].TCTRL |= 0x1; //Enable channel 0

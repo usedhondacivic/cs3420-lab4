@@ -37,9 +37,10 @@ void l_unlock(lock_t* l){
 	PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
 	//Add first blocked process back into the scheduler
 	node *fst = remove_first_elem(&(l->queue));
-	fst->val->blocked = false;
-	add_elem_end(&scheduler, fst);
-
+	if(fst != NULL){
+		fst->val->blocked = false;
+		add_elem_end(&scheduler, fst);
+	}
 	l->available = true;
 	PIT->CHANNEL[0].TCTRL =3; //Enable interupts
 }
