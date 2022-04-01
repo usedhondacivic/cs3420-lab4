@@ -104,9 +104,12 @@ void process_start (void){
 
 unsigned int * process_select(unsigned int * cursp){
 	node *fst = remove_first_elem(&scheduler); //Check the first element
+	if(current_process != NULL){
+		assert(fst->val == current_process);
+	}
 	if(cursp == NULL){ // Either the running process finished or it is the first time process_select is being called
 		if(!first_select){ //If its not the first time, free memory from the running process
-			process_stack_free(fst->val->orig_sp, fst->val->n);
+			process_stack_free(current_process->orig_sp, current_process->n);
 			free(fst);
 			current_process = NULL;
 		}else{ // If it is the first time, put the element back in the front of the queue
@@ -114,11 +117,12 @@ unsigned int * process_select(unsigned int * cursp){
 			first_select = false;
 		}
 	}else{
-		fst->val->sp = cursp;
-
-		//Put running process back into queue
+		current_process->sp = cursp;
+		//Put running process back into queue, but only if it isn't blocked
 		if(!(current_process->blocked)){
 			add_elem_end(&scheduler, fst);
+		}else{
+			free(fst);
 		}
 	}
 

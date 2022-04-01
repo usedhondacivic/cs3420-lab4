@@ -45,6 +45,7 @@ node * remove_first_elem(double_linked_list * list);
 typedef struct lock_state {
 	struct double_linked_list queue;
 	bool available;
+	process_t *owner;
 } lock_t;
 
 /**

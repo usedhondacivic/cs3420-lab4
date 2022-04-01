@@ -16,7 +16,8 @@ void l_init(lock_t* l){
 
 void l_lock(lock_t* l){
 	PIT->CHANNEL[0].TCTRL = 1; //Disable interupts
-	if(l->available == false){
+	assert(!(current_process->blocked));
+	while(l->available == false){
 		//Change current process to show it has been blocked
 		current_process->blocked = true;
 		//add blocked process to list
@@ -26,10 +27,9 @@ void l_lock(lock_t* l){
 		new_elem_ptr->next = NULL;
 		add_elem_end(&(l->queue), new_elem_ptr);
 		process_blocked();
-	}else{
-		current_process->blocked = false;
-		l->available = false;
 	}
+	l->available = false;
+	l->owner = current_process;
 	PIT->CHANNEL[0].TCTRL = 3; //Enable interupts
 }
 
